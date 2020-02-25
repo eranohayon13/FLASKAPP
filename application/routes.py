@@ -9,6 +9,12 @@ from application import app, db
 from application.models import Posts
 from application.forms import PostForm
 
+#importingbcrypt,users and registraionForm.
+from application import app,db,bcrypt
+from application.models import Posts,Users
+from application.forms import PostForm,RegistrationForm
+
+
 @app.route('/post', methods=['GET', 'POST'])
 def post():
     form = PostForm()
@@ -49,6 +55,17 @@ def about():
 def login():
     return render_template('login.html', title='Login')
 
-@app.route('/register')
+#create register route
+@app.route('/register', methods=['GET', 'POST'])
 def register():
-    return render_template('register.html', title='Register')
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        hash_pw = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+
+        user = Users(email=form.email.data, password=hash_pw)
+
+        db.session.add(user)
+        db.session.commit()
+
+        return redirect(url_for('post'))
+    return render_template('register.html', title='Register', form=form)

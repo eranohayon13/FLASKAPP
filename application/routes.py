@@ -30,6 +30,10 @@ def post():
 
     return render_template('post.html', title='Post', form=form)
 
+@app.route('/posts')
+def posts():
+    allposts = Posts.query.all()
+    return render_template('posts.html', posts=allposts)
 # define routes for / & /home, this function will be called when these are accessed
 @app.route('/')
 @app.route('/home')

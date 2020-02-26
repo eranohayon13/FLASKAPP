@@ -2,8 +2,26 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import Required, Length
 from wtforms import StringField, SubmitField, PasswordField
-from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
+from wtforms.validators import Required, Length, Email, EqualTo, ValidationError
 from application.models import Users
+from wtforms import StringField,SubmitField,PasswordField,BooleanField
+
+class LoginForm(FlaskForm):
+    email=StringField('Email',
+        validators=[
+            Required(),
+            Email()
+         ]
+    )
+
+    password=PasswordField('Password',
+        validators=[
+            Required()
+        ]
+    )
+
+    remember=BooleanField('Remember Me')
+    submit=SubmitField('Login')
 
 class PostForm(FlaskForm):
     first_name = StringField('First Name',
@@ -36,18 +54,18 @@ class PostForm(FlaskForm):
 class RegistrationForm(FlaskForm):
     email = StringField('Email',
         validators = [
-            DataRequired(),
+            Required(),
             Email()
         ]
     )
     password = PasswordField('Password',
         validators = [
-            DataRequired(),
+            Required(),
         ]
     )
     confirm_password = PasswordField('Confirm Password',
         validators = [
-            DataRequired(),
+            Required(),
             EqualTo('password')
         ]
     )

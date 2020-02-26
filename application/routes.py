@@ -1,18 +1,6 @@
-# import render_template function from the flask module
-from flask import render_template
-# import the app object from the ./application/__init__.py
-from application import app
-from application.models import Posts
-
-from flask import render_template, redirect, url_for
-from application import app, db
-from application.models import Posts
-from application.forms import PostForm
-
 #importingbcrypt,users and registraionForm.
-from application import app,db,bcrypt
-from application.models import Posts,Users
-from application.forms import PostForm,RegistrationForm
+from application import app, db, bcrypt
+from application.models import Posts, Users
 #import user loogins and methods from flask logins and forms.py
 from flask_login import login_user, current_user, logout_user, login_required
 from application.forms import PostForm, RegistrationForm, LoginForm
@@ -25,10 +13,9 @@ def post():
     form = PostForm()
     if form.validate_on_submit():
         postData = Posts(
-            first_name = form.first_name.data,
-            last_name = form.last_name.data,
             title = form.title.data,
-            content = form.content.data
+            content = form.content.data,
+            author=current_user
         )
 
         db.session.add(postData)
@@ -79,16 +66,23 @@ def login():
 #create register route
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    if current_user.is_authenticated:
+            return redirect(url_for('home'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        hash_pw = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-
-        user = Users(email=form.email.data, password=hash_pw)
+        hash_pw = bcrypt.generate_password_hash(form.password.data)
+        user = Users(
+                first_name=form.first_name.data,
+                last_name=form.last_name.data,
+                email=form.email.data,
+                password=hash_pw
+        )
 
         db.session.add(user)
         db.session.commit()
 
         return redirect(url_for('post'))
+
     return render_template('register.html', title='Register', form=form)
 
 @app.route("/logout")

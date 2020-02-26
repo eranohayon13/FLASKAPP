@@ -8,35 +8,20 @@ from wtforms import StringField,SubmitField,PasswordField,BooleanField
 
 class LoginForm(FlaskForm):
     email=StringField('Email',
-        validators=[
+        validators = [
             Required(),
             Email()
          ]
     )
 
     password=PasswordField('Password',
-        validators=[
+        validators = [
             Required()
         ]
     )
 
     remember=BooleanField('Remember Me')
-    submit=SubmitField('Login')
-
-class PostForm(FlaskForm):
-    first_name = StringField('First Name',
-        validators = [
-            Required(),
-            Length(min=2, max=30)
-        ]
-    )
-    last_name = StringField('Last Name',
-        validators = [
-            Required(),
-            Length(min=2, max=30)
-        ]
-    )
-    title = StringField('Title',
+    submit=SubmitField('Login',
         validators = [
             Required(),
             Length(min=2, max=100)
@@ -48,10 +33,22 @@ class PostForm(FlaskForm):
             Length(min=2, max=1000)
         ]
     )
-    submit = SubmitField('Post!')
+    submit = SubmitField('Login!')
 
 
 class RegistrationForm(FlaskForm):
+    first_name = StringField('First Name',
+        validators = [
+            Required(),
+            Length(min=2, max=30)
+        ]
+    )
+    last_name = StringField('Last Name',
+        validators = [
+            Required(),
+            Length(min=3, max=30)
+        ]
+    )
     email = StringField('Email',
         validators = [
             Required(),
@@ -71,8 +68,35 @@ class RegistrationForm(FlaskForm):
     )
     submit = SubmitField('Sign Up')
 
+
     def validate_email(self, email):
         user = Users.query.filter_by(email=email.data).first()
 
         if user:
             raise ValidationError('Email already in use')
+class PostForm(FlaskForm):
+    first_name = StringField('First Name',
+        validators = [
+            Required(),
+            Length(min=2, max=30)
+        ]
+    )
+    last_name = StringField('First Name',
+        validators = [
+            Required(),
+            Length(min=2, max=30)
+        ]
+    )
+    title = StringField('First Name',
+        validators = [
+            Required(),
+            Length(min=2, max=100)
+        ]
+    )
+    content = StringField('First Name',
+        validators = [
+            Required(),
+            Length(min=2, max=1000)
+        ]
+    )
+    submit = SubmitField('Post!')

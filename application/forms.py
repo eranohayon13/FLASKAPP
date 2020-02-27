@@ -1,102 +1,100 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField
-from wtforms.validators import Required, Length
-from wtforms import StringField, SubmitField, PasswordField
-from wtforms.validators import Required, Length, Email, EqualTo, ValidationError
+from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from application.models import Users
 from wtforms import StringField,SubmitField,PasswordField,BooleanField
+from flask_login import current_user
 
-class LoginForm(FlaskForm):
-    email=StringField('Email',
+class PostForm(FlaskForm):
+    title = StringField('Title',
         validators = [
-            Required(),
-            Email()
-         ]
-    )
-
-    password=PasswordField('Password',
-        validators = [
-            Required()
-        ]
-    )
-
-    remember=BooleanField('Remember Me')
-    submit=SubmitField('Login',
-        validators = [
-            Required(),
+            DataRequired(),
             Length(min=2, max=100)
         ]
     )
+
     content = StringField('Content',
         validators = [
-            Required(),
+            DataRequired(),
             Length(min=2, max=1000)
         ]
     )
-    submit = SubmitField('Login!')
-
+    submit = SubmitField('Post!')
 
 class RegistrationForm(FlaskForm):
     first_name = StringField('First Name',
         validators = [
-            Required(),
+            DataRequired(),
             Length(min=2, max=30)
         ]
     )
     last_name = StringField('Last Name',
         validators = [
-            Required(),
+            DataRequired(),
             Length(min=3, max=30)
         ]
     )
     email = StringField('Email',
         validators = [
-            Required(),
+            DataRequired(),
             Email()
         ]
     )
     password = PasswordField('Password',
         validators = [
-            Required(),
+            DataRequired(),
         ]
     )
     confirm_password = PasswordField('Confirm Password',
         validators = [
-            Required(),
+            DataRequired(),
             EqualTo('password')
         ]
     )
     submit = SubmitField('Sign Up')
-
 
     def validate_email(self, email):
         user = Users.query.filter_by(email=email.data).first()
 
         if user:
             raise ValidationError('Email already in use')
-class PostForm(FlaskForm):
+
+class LoginForm(FlaskForm):
+    email=StringField('Email',
+        validators = [
+            DataRequired(),
+            Email()
+         ]
+    )
+
+    password=PasswordField('Password',
+        validators = [
+            DataRequired(),
+        ]
+    )
+
+    remember=BooleanField('Remember Me')
+    submit = SubmitField('Login!')
+#Similar to registartion form however they cant change password because the form doesnt contain the password. And the validator will only check if the email that is used is unique and different ot that of the current user, this prevent a form from bein gconsidered invalid the the user does not change their email address.
+class UpdateAccountForm(FlaskForm):
     first_name = StringField('First Name',
-        validators = [
-            Required(),
+        validators=[
+            DataRequired(),
             Length(min=2, max=30)
-        ]
-    )
-    last_name = StringField('First Name',
-        validators = [
-            Required(),
-            Length(min=2, max=30)
-        ]
-    )
-    title = StringField('First Name',
-        validators = [
-            Required(),
-            Length(min=2, max=100)
-        ]
-    )
-    content = StringField('First Name',
-        validators = [
-            Required(),
-            Length(min=2, max=1000)
-        ]
-    )
-    submit = SubmitField('Post!')
+        ])
+    last_name = StringField('Last Name',
+        validators=[
+            DataRequired(),
+            Length(min=4, max=30)
+        ])
+    email = StringField('Email',
+            validators=[
+                DataRequired(),
+                Email()
+        ])
+    submit =  SubmitField('Update')
+
+    def validate_email(self,email):
+        if email.data != current_user.email:
+            user = Users.query.filter_by(email=email.data).first()
+            if user:
+                raise ValidationError('Email already in use')
